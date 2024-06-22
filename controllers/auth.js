@@ -41,4 +41,24 @@ exports.register = (req, res) => {
 
 }
 
-exports.login = () => {}
+exports.login = (req, res) => {
+    const { email, password } = req.body;
+    User.findOne({ email }).then((user) => {
+        if (!user) return res.status(422).json({ message: 'You have entered the wrong credentials. Please try again' });
+        else if (user) {
+            bcrypt.compare(password, user.password).then((isCorrect) => {
+            if (!isCorrect) return res.status(422).json({ message: 'You have entered the wrong credentials. Please try again' });
+            const userObject = { name: user.name, email: user.email, _id: user._id };
+            const token = jwt.sign({ email: userObject.email, _id: userObject._id }, 'database', { expiresIn: 60 * 60 });
+            return res.status(200).json({ message: 'Login Success', token, userObject })
+            }).catch((err) => {
+                console.log(err);
+                return res.status(500).json({ message: 'An error occured' });
+            })
+        }
+    }).catch((err) => {
+        console.log(err);
+        return res.status(500).json({ message: 'An error occured' });
+    });
+
+}
