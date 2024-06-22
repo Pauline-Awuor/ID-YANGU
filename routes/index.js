@@ -1,13 +1,15 @@
-const express = require('express');
-const mainController = require('../controllers');
-const authRouter = require('./auth');
+const express = require('express')
+const mainController = require('../controllers')
 
-const mainRouter = express.Router();
+const authRouter = require('./auth')
+const idRouter = require('./idDetail')
 
-mainRouter.get('/', mainController.main);
+const mainRouter = express.Router()
 
-mainRouter.use('/auth', authRouter);
+mainRouter.get('/', mainController.main)
+
+mainRouter.user('/auth', authRouter)
+mainRouter.use('/idDetails', idRouter)
 
 module.exports = mainRouter;
 
-app.listen(3000)

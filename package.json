@@ -19,10 +19,11 @@
   "homepage": "https://github.com/Pauline-Awuor/ID-FINDER#readme",
   "description": "",
   "dependencies": {
-    "bcrpyt": "^2.0.0",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.3"
   },
   "devDependencies": {
