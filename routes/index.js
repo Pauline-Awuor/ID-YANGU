@@ -8,7 +8,7 @@ const mainRouter = express.Router()
 
 mainRouter.get('/', mainController.main)
 
-mainRouter.user('/auth', authRouter)
+mainRouter.use('/auth', authRouter)
 mainRouter.use('/idDetails', idRouter)
 
 module.exports = mainRouter;
