@@ -9,6 +9,7 @@ const idSchema = new Schema(
     idNumber: { type: Number, required: true, unique: true },
     date: { type: Date, required: true },
     phone: { type: String, required: true },
+    
   },
   { timestamps: true }
 );
