@@ -17,17 +17,18 @@
     "url": "https://github.com/Pauline-Awuor/ID-FINDER/issues"
   },
   "homepage": "https://github.com/Pauline-Awuor/ID-FINDER#readme",
-  "description": "",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.4.3"
+    "mongoose": "^8.4.4"
   },
   "devDependencies": {
     "dotenv": "^16.4.5",
     "nodemon": "^3.1.4"
-  }
+  },
+  "keywords": [],
+  "description": ""
 }
