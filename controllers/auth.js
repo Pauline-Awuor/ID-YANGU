@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/mailer");
 const dotenv = require("dotenv");
+const forgotPasswordTemplate = require("../utils/templates");
 dotenv.config();
 
 const CLIENT_URL = process.env.CLIENT_URL; //CLIENT_URL=http://localhost:3000
@@ -123,7 +124,9 @@ exports.forgotPassword = async (req, res) => {
         );
 
         // Send email with verification token
-        const subject = `Hello, Click on this link to reset your password: ${CLIENT_URL}/auth/reset-password/${token}\n Best regards,\nFynd`;
+        const subject = forgotPasswordTemplate(
+          `${CLIENT_URL}/auth/reset-password/${token}`
+        );
         await sendMail(email, "Reset Password", subject);
 
         return res
