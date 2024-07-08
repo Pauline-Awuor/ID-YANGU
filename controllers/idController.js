@@ -49,6 +49,20 @@ exports.updateId = async (req, res) => {
   }
 };
 
+// Fetch all IDs posted by a specific user
+app.get('/user/:userId/ids', async (req, res) => {
+  try {
+    const ids = await LostID.find({ userId: req.params.userId });
+    if (ids.length === 0) {
+      return res.status(404).json({ message: 'No IDs found for this user' });
+    }
+    res.json(ids);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred' });
+  }
+});
+
 // Delete an ID
 exports.deleteId = async (req, res) => {
   try {
