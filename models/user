@@ -9,8 +9,6 @@ const userSchema = new Schema({
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
 },{timestamps: true});
+// Create the model and expose it to our app
+module.exports = mongoose.model('User', userSchema);
 
-
-
-
-module.exports = LostID;

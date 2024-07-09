@@ -1,4 +1,3 @@
-// controllers/idController.js
 const Id = require('../models/ID-card');
 
 // Controller functions
@@ -50,9 +49,9 @@ exports.updateId = async (req, res) => {
 };
 
 // Fetch all IDs posted by a specific user
-app.get('/user/:userId/ids', async (req, res) => {
+exports.getIdsByUserId = async (req, res) => {
   try {
-    const ids = await LostID.find({ userId: req.params.userId });
+    const ids = await Id.find({ userId: req.params.userId });
     if (ids.length === 0) {
       return res.status(404).json({ message: 'No IDs found for this user' });
     }
@@ -61,7 +60,7 @@ app.get('/user/:userId/ids', async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'An error occurred' });
   }
-});
+};
 
 // Delete an ID
 exports.deleteId = async (req, res) => {
