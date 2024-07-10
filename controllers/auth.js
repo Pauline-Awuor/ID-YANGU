@@ -6,6 +6,7 @@ const dotenv = require("dotenv");
 const forgotPasswordTemplate = require("../utils/templates");
 dotenv.config();
 
+
 const CLIENT_URL = process.env.CLIENT_URL; //CLIENT_URL=http://localhost:3000
 
 exports.register = (req, res) => {
