@@ -41,17 +41,24 @@ exports.register = (req, res) => {
       const newUser = new User({ name, email, password: hashedPassword });
       newUser
         .save()
-        .then((us) => {
-          const userObject = { name: us.name, email: us.email, _id: us._id };
-          const token = jwt.sign(
-            { email: userObject.email, _id: userObject._id },
-            "database",
-            { expiresIn: 60 * 60 }
-          );
+        .then((user) => {
+          const userObject = user["_doc"];
+            delete userObject.password;
+
+//  Generate Access Token
+const accessToken = jwt.sign({ email: userObject.email, _id: userObject._id }, process.env.SECRET_KEY, {
+  expiresIn: '1h',
+});
+//  Generate Refresh Token
+const refreshToken = jwt.sign({ email: userObject.email, _id: userObject._id }, process.env.SECRET_KEY, {
+  expiresIn: '7d',
+});
+
           return res.status(201).json({
             message: "User registered successfully",
-            token,
             user: userObject,
+            accessToken,
+            refreshToken,
           });
         })
         .catch((err) => {
@@ -82,19 +89,19 @@ exports.login = (req, res) => {
                 message:
                   "You have entered the wrong credentials. Please try again",
               });
-            const userObject = {
-              name: user.name,
-              email: user.email,
-              _id: user._id,
-            };
-            const token = jwt.sign(
-              { email: userObject.email, _id: userObject._id },
-              "database",
-              { expiresIn: 60 * 60 }
-            );
+            const userObject = user["_doc"];
+            delete userObject.password;
+            //  Generate Access Token
+const accessToken = jwt.sign({ email: userObject.email, _id: userObject._id }, process.env.SECRET_KEY, {
+  expiresIn: '1h',
+});
+//  Generate Refresh Token
+const refreshToken = jwt.sign({ email: userObject.email, _id: userObject._id }, process.env.SECRET_KEY, {
+  expiresIn: '7d',
+});
             return res
               .status(200)
-              .json({ message: "Login Success", token, userObject });
+              .json({ message: "Login Success", user: userObject, accessToken, refreshToken });
           })
           .catch((err) => {
             console.log(err);
@@ -118,11 +125,10 @@ exports.forgotPassword = async (req, res) => {
             "Could not find an account with the entered email. Please try again",
         });
       } else {
-        const token = jwt.sign(
-          { email: user.email, _id: user._id },
-          process.env.SECRET_KEY,
-          { expiresIn: 60 * 60 } // 1 hour
-        );
+        //  Generate Reset Token
+const token = jwt.sign({ email: user.email, _id: user._id }, process.env.SECRET_KEY, {
+  expiresIn: '1h',
+});
 
         // Send email with verification token
         const subject = forgotPasswordTemplate(

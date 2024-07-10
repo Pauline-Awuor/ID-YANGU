@@ -18,10 +18,10 @@ async function accessToken(
           401
         )
       );
-    const decodedToken = jwt.verify(
-      token,
-      process.env.TOKEN_SECRET
-    ) 
+      const decodedToken = jwt.verify(
+        token,
+      process.env.SECRET_KEY
+      );
     const id = decodedToken?._id.trim();
 
     const foundProfile = (await User.findById(id, {
@@ -40,7 +40,6 @@ async function accessToken(
           401
         )
       );
-    req.userId = id;
     req.user = { ...foundProfile["_doc"] };
    
     next();

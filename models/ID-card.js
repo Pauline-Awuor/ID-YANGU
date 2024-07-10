@@ -9,7 +9,7 @@ const idSchema = new Schema(
     idNumber: { type: Number, required: true, unique: true },
     date: { type: Date, required: true },
     phone: { type: String, required: true },
-    Birthlocation: { type: String, required: true },
+    birthLocation: { type: String, },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Add userId field
     
   },
