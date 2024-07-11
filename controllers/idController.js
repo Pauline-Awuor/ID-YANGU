@@ -2,6 +2,7 @@ const Id = require("../models/ID-card");
 const HttpError = require("../models/http-error");
 const dotenv = require("dotenv");
 dotenv.config();
+const sendIdNotFoundNotification = require("../utils/mailer") 
 // Create a new ID
 exports.createId = async (req, res, next) => {
   try {
@@ -40,16 +41,17 @@ exports.createId = async (req, res, next) => {
 // Get all IDs
 exports.getAllIds = async (req, res) => {
   try {
-    const { userId } = req.query;
-    let foundIdDetails;
-    if(!userId) {
-    foundIdDetails = await Id.findOne({});
-    }
-    
-    foundIdDetails = await Id.findOne({ _id: req.params.id, userId });
+   
+   
+     const foundIdDetails = await Id.find({});
     res.status(200).json({ids: foundIdDetails});
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error(err);
+    return next(new HttpError(
+      "server error",
+      "An error has occurred while trying to get all IDs",
+      500
+    ));
   }
 };
 
@@ -61,10 +63,14 @@ exports.getId = async (req, res) => {
       return res.status(404).json({ message: "ID not found" });
     }
     res.status(200).json(id);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+  }catch (err) {
+    console.error(err);
+    return next(new HttpError(
+      "server error",
+      "An error has occurred while trying to get an ID",
+      500
+    ));
+}};
 
 // Update an ID
 exports.updateId = async (req, res) => {
@@ -79,9 +85,13 @@ exports.updateId = async (req, res) => {
     }
     res.status(200).json(updatedId);
   } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+    console.error(err);
+    return next(new HttpError(
+      "server error",
+      "An error has occurred while trying to update ID",
+      500
+    ));
+}};
 
 // Fetch all IDs posted by a specific user
 exports.getIdsByUserId = async (req, res) => {
@@ -91,11 +101,14 @@ exports.getIdsByUserId = async (req, res) => {
       return res.status(404).json({ message: "No IDs found for this user" });
     }
     res.json(ids);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "An error occurred" });
-  }
-};
+  } catch (err) {
+    console.error(err);
+    return next(new HttpError(
+      "server error",
+      "An error has occurred while trying to fetch all IDs",
+      500
+    ));
+}};
 
 // Delete an ID
 exports.deleteId = async (req, res) => {
@@ -109,6 +122,59 @@ exports.deleteId = async (req, res) => {
     }
     res.status(200).json({ message: "ID deleted successfully" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+    console.error(err);
+    return next(new HttpError(
+      "server error",
+      "An error has occurred while trying to delete ID",
+      500
+    ));
+}};
+
+//Search for an ID
+exports.searchId = async (req, res, next) => {
+  try {
+    const { idNumber } = req.query;
+    const foundId = await idController.findId(idNumber);
+
+    if (foundId) {
+      return res.status(200).json(foundId);
+    } else {
+      const existingRequest = await IdRequest.findOne({ email: req.user.email, idNumber });
+      if (!existingRequest) {
+        await IdRequest.create({ email: req.user.email, idNumber });
+      }
+      return res.status(404).json({ message: 'ID not found. You will be notified when it is found.' });
+    }
+  } catch (err) {
+    console.error(err);
+    return next(new HttpError(
+      "server error",
+      "An error has occurred while trying to search for ID details",
+      500
+    ));
+}};
+
+//notify
+exports.notifyUser = async (req, res, next) => {
+  try {
+    const { notify } = req.query;
+
+      const existingRequest = await IdRequest.findOne({ email: req.user.email });
+      if (!existingRequest) {
+        return res.status(404).json({ message: 'The details entered does not match a request.' });
+      }
+      existingRequest.notified=notify ==='true' ? true : false;
+      await existingRequest.save();
+      sendIdNotFoundNotification(req.user.email,existingRequest.idNumber)
+
+      return res.status(200).json({ message: 'You will be notified when it is found.' });
+    
+  } catch (err) {
+    console.error(err);
+    return next(new HttpError(
+      "server error",
+      "An error has occurred while trying to create a notification request",
+      500
+    ));
+  }}
+
