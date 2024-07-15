@@ -40,6 +40,7 @@ async function accessToken(req, res, next) {
     }
 
     req.user = { ...foundProfile._doc };
+    
     next();
   } catch (err) {
     console.error("Access token validation failed:", err);

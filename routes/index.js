@@ -11,5 +11,6 @@ mainRouter.get('/', mainController.main)
 mainRouter.use('/auth', authRouter)
 mainRouter.use('/idDetails', idRouter)
 
+
 module.exports = mainRouter;
 

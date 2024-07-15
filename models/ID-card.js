@@ -10,7 +10,7 @@ const idSchema = new Schema(
     date: { type: Date, required: true },
     phone: { type: String, required: true },
     birthLocation: { type: String, },
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Add userId field
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
     
   },
   { timestamps: true }
