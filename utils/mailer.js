@@ -8,6 +8,7 @@ const SMTP_PASSWORD = process.env.SMTP_PASSWORD;
 const SMTP_PORT = process.env.SMTP_PORT;
 
 async function sendMail(email, subject, html) {
+  console.log("sendMail function called");
   try {
     const transport = nodemailer.createTransport({
       host: SMTP_HOST,

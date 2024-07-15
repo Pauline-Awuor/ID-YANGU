@@ -1,11 +1,11 @@
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const sendMail = require("../utils/mailer");
+const { sendMail } = require("../utils/mailer");
+console.log(sendMail); 
 const dotenv = require("dotenv");
 const forgotPasswordTemplate = require("../utils/templates");
 dotenv.config();
-
 
 const CLIENT_URL = process.env.CLIENT_URL; //CLIENT_URL=http://localhost:3000
 
@@ -43,16 +43,24 @@ exports.register = (req, res) => {
         .save()
         .then((user) => {
           const userObject = user["_doc"];
-            delete userObject.password;
+          delete userObject.password;
 
-//  Generate Access Token
-const accessToken = jwt.sign({ email: userObject.email, _id: userObject._id }, process.env.SECRET_KEY, {
-  expiresIn: '1h',
-});
-//  Generate Refresh Token
-const refreshToken = jwt.sign({ email: userObject.email, _id: userObject._id }, process.env.SECRET_KEY, {
-  expiresIn: '7d',
-});
+          //  Generate Access Token
+          const accessToken = jwt.sign(
+            { email: userObject.email, _id: userObject._id },
+            process.env.SECRET_KEY,
+            {
+              expiresIn: "1h",
+            }
+          );
+          //  Generate Refresh Token
+          const refreshToken = jwt.sign(
+            { email: userObject.email, _id: userObject._id },
+            process.env.SECRET_KEY,
+            {
+              expiresIn: "7d",
+            }
+          );
 
           return res.status(201).json({
             message: "User registered successfully",
@@ -92,16 +100,29 @@ exports.login = (req, res) => {
             const userObject = user["_doc"];
             delete userObject.password;
             //  Generate Access Token
-const accessToken = jwt.sign({ email: userObject.email, _id: userObject._id }, process.env.SECRET_KEY, {
-  expiresIn: '1h',
-});
-//  Generate Refresh Token
-const refreshToken = jwt.sign({ email: userObject.email, _id: userObject._id }, process.env.SECRET_KEY, {
-  expiresIn: '7d',
-});
+            const accessToken = jwt.sign(
+              { email: userObject.email, _id: userObject._id },
+              process.env.SECRET_KEY,
+              {
+                expiresIn: "1h",
+              }
+            );
+            //  Generate Refresh Token
+            const refreshToken = jwt.sign(
+              { email: userObject.email, _id: userObject._id },
+              process.env.SECRET_KEY,
+              {
+                expiresIn: "7d",
+              }
+            );
             return res
               .status(200)
-              .json({ message: "Login Success", user: userObject, accessToken, refreshToken });
+              .json({
+                message: "Login Success",
+                user: userObject,
+                accessToken,
+                refreshToken,
+              });
           })
           .catch((err) => {
             console.log(err);
@@ -126,9 +147,13 @@ exports.forgotPassword = async (req, res) => {
         });
       } else {
         //  Generate Reset Token
-const token = jwt.sign({ email: user.email, _id: user._id }, process.env.SECRET_KEY, {
-  expiresIn: '1h',
-});
+        const token = jwt.sign(
+          { email: user.email, _id: user._id },
+          process.env.SECRET_KEY,
+          {
+            expiresIn: "1h",
+          }
+        );
 
         // Send email with verification token
         const subject = forgotPasswordTemplate(
@@ -194,4 +219,3 @@ exports.resetPassword = (req, res) => {
     }
   });
 };
-
