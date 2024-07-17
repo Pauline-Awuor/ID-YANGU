@@ -56,7 +56,7 @@ exports.getAllIds = async (req, res) => {
 };
 
 // Get one ID
-exports.getId = async (req, res) => {
+exports.getId = async (req, res, next) => {
   try {
     const id = await Id.findOne({ _id: req.params.id, userId: req.user._id });
     if (!id) {
