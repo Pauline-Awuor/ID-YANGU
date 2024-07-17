@@ -4,10 +4,10 @@ const User = require("../models/user");
 
 exports.updateProfile = async (req, res) => {
   const userId = req.user._id;
-  const { name, email } = req.body;
+  const { name, email ,phone} = req.body;
 
   try {
-    const user = await User.findByIdAndUpdate(userId, {name, email}, { new: true, select: '-password' });
+    const user = await User.findByIdAndUpdate(userId, {name, email ,phone}, { new: true, select: '-password' });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
