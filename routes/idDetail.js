@@ -12,7 +12,7 @@ router.patch("/:id", accessToken, idController.updateId);
 
 router.get("/", idController.getAllIds);
 
-router.get("/:id", accessToken, idController.getId);
+router.get("/single/:id", accessToken, idController.getId);
 
 router.delete("/:id", accessToken, idController.deleteId);
 
