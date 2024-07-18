@@ -2,14 +2,14 @@ const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendMail } = require("../utils/mailer");
-console.log(sendMail); 
+console.log(sendMail);
 const dotenv = require("dotenv");
 const forgotPasswordTemplate = require("../utils/templates");
 dotenv.config();
 
 const CLIENT_URL = process.env.CLIENT_URL; //CLIENT_URL=http://localhost:3000
 
-exports.register = (req, res) => {
+exports.register = async (req, res) => {
   const name = req.body.name;
   const email = req.body.email;
   const password = req.body.password;
@@ -41,7 +41,7 @@ exports.register = (req, res) => {
       const newUser = new User({ name, email, password: hashedPassword });
       newUser
         .save()
-        .then((user) => {
+        .then(async (user) => {
           const userObject = user["_doc"];
           delete userObject.password;
 
@@ -62,6 +62,32 @@ exports.register = (req, res) => {
             }
           );
 
+          const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "Welcome to Fynd!",
+            text: `Hello ${name},\n\nWelcome to Fynd! We're glad to have you on board.\n\nBest regards,\nFynd Team`,
+          };
+
+          await sendMail(
+            email,
+            "Welcome to Fynd",
+            `
+          <div style="font-family: Arial, sans-serif; color: #333;">
+            <h2 style="color: #3498db;">Welcome to Fynd, ${name}!</h2>
+            <p>We're glad to have you on board. Fynd is here to help you post and search for lost IDs easily and securely.</p>
+            <p>Here's a quick overview of what you can do on Fynd:</p>
+            <ul>
+              <li><strong>Post Lost IDs:</strong> Let others know about your lost ID.</li>
+              <li><strong>Search Found IDs:</strong> Find lost IDs that others have posted.</li>
+              <li><strong>Contact Finders:</strong> Reach out to the person who found your ID.</li>
+            </ul>
+            <p>If you have any questions or need assistance, feel free to contact our support team.</p>
+            <p>Best regards,</p>
+            <p>The Fynd Team</p>
+          </div>
+        `
+          );
           return res.status(201).json({
             message: "User registered successfully",
             user: userObject,
@@ -115,14 +141,12 @@ exports.login = (req, res) => {
                 expiresIn: "7d",
               }
             );
-            return res
-              .status(200)
-              .json({
-                message: "Login Success",
-                user: userObject,
-                accessToken,
-                refreshToken,
-              });
+            return res.status(200).json({
+              message: "Login Success",
+              user: userObject,
+              accessToken,
+              refreshToken,
+            });
           })
           .catch((err) => {
             console.log(err);

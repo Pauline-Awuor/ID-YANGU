@@ -17,7 +17,7 @@ async function sendMail(email, subject, html) {
       auth: { user: SMTP_EMAIL, pass: SMTP_PASSWORD },
     });
     await transport.sendMail({
-      from: `FYND ${SMTP_EMAIL}`,
+      from: `Fynd ${SMTP_EMAIL}`,
       to: email,
       subject,
       html,
