@@ -477,5 +477,37 @@ table, td { color: #000000; } #u_body a { color: #161a39; text-decoration: under
 </html>
 `;
 };
+const welcomeEmail=()=>{
+  return 
+  `
 
-module.exports = forgotPasswordTemplate;
+<div style="font-family: Arial, sans-serif; color: #333;">
+
+  <h2 style="color: #3498db;">Welcome to Fynd, ${name}!</h2>
+
+  <p>We're glad to have you on board. Fynd is here to help you post and search for lost IDs easily and securely.</p>
+
+  <p>Here's a quick overview of what you can do on Fynd:</p>
+
+  <ul>
+
+    <li><strong>Post Lost IDs:</strong> Let others know about your lost ID.</li>
+
+    <li><strong>Search Found IDs:</strong> Find lost IDs that others have posted.</li>
+
+    <li><strong>Contact Finders:</strong> Reach out to the person who found your ID.</li>
+
+  </ul>
+
+  <p>If you have any questions or need assistance, feel free to contact our support team.</p>
+
+  <p>Best regards,</p>
+
+  <p>The Fynd Team</p>
+
+</div>
+
+`
+}
+
+module.exports = forgotPasswordTemplate, welcomeEmail;
