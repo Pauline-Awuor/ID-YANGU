@@ -33,12 +33,15 @@ exports.getPostedIds = async (req, res) => {
   const userId = req.user._id;
 
   try {
-    const postedIds = await idCard.find({ user: userId });
-    if (!postedIds || postedIds.length === 0) {
-      return res.status(404).json({ message: "No posted IDs found" });
-    }
+    const[postedIds,itemCount]= await Promise.all([
+     idCard.find({ user: userId }).populate("userId","-password"),
+      idCard.countDocuments({ user: userId })
+    ]);
+     
+    
+    
 
-    res.status(200).json({ message: "Posted IDs", postedIds });
+    res.status(200).json({ message: "Posted IDs", postedIds ,total: itemCount});
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "An error occurred" });
