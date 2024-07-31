@@ -38,22 +38,22 @@ exports.createId = async (req, res, next) => {
   }
 };
 
+
 // Get all IDs
 exports.getAllIds = async (req, res) => {
   try {
-   
-   
-     const foundIdDetails = await Id.find({});
-    res.status(200).json({ids: foundIdDetails});
+    const [foundIdDetails,itemCount] = await Promise.all([
+      Id.find().populate("userId","-password").sort({ createdAt: -1 }),
+      Id.find().countDocuments(), // Count the number of documents
+    ]);
+    res.status(200).json({ids: foundIdDetails, total:itemCount});
   } catch (err) {
     console.error(err);
     return next(new HttpError(
       "server error",
       "An error has occurred while trying to get all IDs",
-      500
-    ));
-  }
-};
+      500))}}
+
 
 // Get one ID
 exports.getId = async (req, res, next) => {
