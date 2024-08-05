@@ -26,7 +26,7 @@ async function sendMail(email, subject, html) {
     console.log(err);
   }
 }
-
+//async function
 async function sendIdNotFoundNotification(email, idNumber) {
   const subject = "ID Search Notification";
   const html = `
