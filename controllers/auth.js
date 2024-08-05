@@ -6,105 +6,129 @@ console.log(sendMail);
 const dotenv = require("dotenv");
 const forgotPasswordTemplate = require("../utils/templates");
 dotenv.config();
+const welcomeEmailTemplate = require("../utils/templates");
+
 
 const CLIENT_URL = process.env.CLIENT_URL; //CLIENT_URL=http://localhost:3000
 
 exports.register = async (req, res) => {
-  const name = req.body.name;
-  const email = req.body.email;
-  const password = req.body.password;
-  if (!name) {
-    return res.status(422).json({ message: "Your full names are required" });
-  }
-  if (!email) {
-    return res.status(422).json({ message: "Your email address is required" });
-  }
-  if (!password) {
-    return res.status(422).json({ message: "Your password is required" });
-  }
-  User.findOne({ email: email })
-    .then((user) => {
-      if (user) {
-        return res
-          .status(422)
-          .json({ message: "The email address already exists" });
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-      return res.status(500).json({ message: "An error occured" });
-    });
 
-  bcrypt
-    .hash(password, 12)
-    .then((hashedPassword) => {
+  try{
+
+  const name = req.body.name;
+
+  const email = req.body.email;
+
+  const password = req.body.password;
+
+  if (!name) {
+
+    return res.status(422).json({ message: "Your full names are required" });
+
+  }
+
+  if (!email) {
+
+    return res.status(422).json({ message: "Your email address is required" });
+
+  }
+
+  if (!password) {
+
+    return res.status(422).json({ message: "Your password is required" });
+
+  }
+
+
+
+
+  const foundUser = await User.findOne({ email: email })
+
+    if (foundUser) {
+
+        return res
+
+          .status(422)
+
+          .json({ message: "The email address already exists" });
+
+      }
+
+    
+
+  const hashedPassword = await bcrypt.hash(password, 12)
+
       const newUser = new User({ name, email, password: hashedPassword });
-      newUser
-        .save()
-        .then(async (user) => {
-          const userObject = user["_doc"];
-          delete userObject.password;
+
+      newUser.save()
+
+      const userProfile = newUser["_doc"];
+
+          delete userProfile.password;
+
+
+
 
           //  Generate Access Token
+
           const accessToken = jwt.sign(
-            { email: userObject.email, _id: userObject._id },
+
+            { email: userProfile.email, _id: userProfile._id },
+
             process.env.SECRET_KEY,
+
             {
+
               expiresIn: "1h",
+
             }
+
           );
+
           //  Generate Refresh Token
+
           const refreshToken = jwt.sign(
-            { email: userObject.email, _id: userObject._id },
+
+            { email: userProfile.email, _id: userProfile._id },
+
             process.env.SECRET_KEY,
+
             {
+
               expiresIn: "7d",
+
             }
+
           );
 
-          const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: "Welcome to Fynd!",
-            text: `Hello ${name},\n\nWelcome to Fynd! We're glad to have you on board.\n\nBest regards,\nFynd Team`,
-          };
 
-          await sendMail(
-            email,
-            "Welcome to Fynd",
-            `
-          <div style="font-family: Arial, sans-serif; color: #333;">
-            <h2 style="color: #3498db;">Welcome to Fynd, ${name}!</h2>
-            <p>We're glad to have you on board. Fynd is here to help you post and search for lost IDs easily and securely.</p>
-            <p>Here's a quick overview of what you can do on Fynd:</p>
-            <ul>
-              <li><strong>Post Lost IDs:</strong> Let others know about your lost ID.</li>
-              <li><strong>Search Found IDs:</strong> Find lost IDs that others have posted.</li>
-              <li><strong>Contact Finders:</strong> Reach out to the person who found your ID.</li>
-            </ul>
-            <p>If you have any questions or need assistance, feel free to contact our support team.</p>
-            <p>Best regards,</p>
-            <p>The Fynd Team</p>
-          </div>
-        `
-          );
+          const subject = welcomeEmailTemplate()
+          await sendMail(email,"Welcome to Fynd",subject);
+
           return res.status(201).json({
+
             message: "User registered successfully",
-            user: userObject,
+
+            user: userProfile,
+
             accessToken,
+
             refreshToken,
+
           });
-        })
-        .catch((err) => {
-          console.log(err);
-          return res.status(500).json({ message: "An error occured" });
-        });
-    })
-    .catch((err) => {
+
+      
+
+    } catch (err) {
+
       console.log(err);
-      return res.status(500).json({ message: "An error occured" });
-    });
+
+      return res.status(500).json({ message: "An error occurred" });
+
+    };
+
 };
+
 
 exports.login = (req, res) => {
   const { email, password } = req.body;
