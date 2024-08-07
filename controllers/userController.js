@@ -28,18 +28,16 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// Get posted IDs by user
 exports.getPostedIds = async (req, res) => {
+  try {
   const userId = req.user._id;
 
-  try {
-    const[postedIds,itemCount]= await Promise.all([
-     idCard.find({ user: userId }).populate("userId","-password"),
-      idCard.countDocuments({ user: userId })
-    ]);
-     
-    
-    
+    // Fetch the IDs associated with the user
+    const userIds = await IdCard.find({ userId });
+
+    // Respond with the found IDs
+    res.status(200).json({ message: "Posted IDs", postedIds: userIds ,total: userIds.length});
+
 
     res.status(200).json({ message: "Posted IDs", postedIds ,total: itemCount});
   } catch (err) {
