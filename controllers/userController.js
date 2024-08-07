@@ -33,7 +33,7 @@ exports.getPostedIds = async (req, res) => {
   const userId = req.user._id;
 
     // Fetch the IDs associated with the user
-    const userIds = await IdCard.find({ userId });
+    const userIds = await idCard.find({ userId });
 
     // Respond with the found IDs
     res.status(200).json({ message: "Posted IDs", postedIds: userIds ,total: userIds.length});
