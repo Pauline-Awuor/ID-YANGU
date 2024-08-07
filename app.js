@@ -31,6 +31,15 @@ app.use((req, res) => {
   res.status(404).json({ message: "Page not found" });
 });
 
+app.use((error, req, res, next) => {
+
+  res.status(error.code || 500);
+
+  res.json({ message: error.message || 'An unknown error has occured', content: error.content || null })
+
+});
+
+
 mongoose
   .set("strictQuery", false)
   .connect(mongoUrl)
