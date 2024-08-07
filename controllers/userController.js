@@ -39,7 +39,7 @@ exports.getPostedIds = async (req, res) => {
     res.status(200).json({ message: "Posted IDs", postedIds: userIds ,total: userIds.length});
 
 
-    res.status(200).json({ message: "Posted IDs", postedIds ,total: itemCount});
+  
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "An error occurred" });
