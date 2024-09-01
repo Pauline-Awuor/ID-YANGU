@@ -9,11 +9,19 @@ const idSchema = new Schema(
     idNumber: { type: Number, required: true, unique: true },
     date: { type: Date, required: true },
     phone: { type: String, required: true },
-    birthLocation: { type: String, },
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
-    
+    birthLocation: { type: String },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("idNumber", idSchema);
+// Add a method to hide sensitive information
+idSchema.methods.toJSON = function () {
+  const idObj = this.toObject();
+  // Filter out sensitive information
+  delete idObj.userId;
+  delete idObj.birthLocation;
+  return idObj;
+};
+
+module.exports = mongoose.model("IDCard", idSchema);
