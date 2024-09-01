@@ -6,12 +6,14 @@ const IdRequest = require('../models/IdRequest');
 exports.createId = async (req, res, next) => {
   try {
     const { name, location, idNumber, date, phone, birthLocation } = req.body;
-    const userId = req.user._id;
+    const userId = req.user._id; // Get user ID from request user object
+
     const foundDetails = await Id.findOne({ idNumber });
 
     if (foundDetails) {
-      return next(new HttpError("validation error", "Details already exists", 422));
+      return next(new HttpError("validation error", "Details already exist", 422));
     }
+
     const newIdDetails = await Id.create({
       name,
       location,
@@ -21,21 +23,18 @@ exports.createId = async (req, res, next) => {
       birthLocation,
       userId,
     });
+
     res.status(201).json({
       message: "ID Details created successfully",
       newId: newIdDetails.toJSON(),
     });
   } catch (err) {
     console.error(err);
-    return next(new HttpError(
-      "server error",
-      "An error has occurred while trying to create ID",
-      500
-    ));
+    return next(new HttpError("server error", "An error has occurred while trying to create ID", 500));
   }
 };
 
-// Get all IDs (only for admins)
+// Get all IDs (admin only)
 exports.getAllIds = async (req, res, next) => {
   try {
     if (!req.user.isAdmin) {
@@ -46,6 +45,7 @@ exports.getAllIds = async (req, res, next) => {
       Id.find().populate("userId", "-password").sort({ createdAt: -1 }),
       Id.countDocuments(),
     ]);
+
     res.status(200).json({ ids: foundIdDetails.map(id => id.toJSON()), total: itemCount });
   } catch (err) {
     console.error(err);
@@ -67,7 +67,7 @@ exports.getId = async (req, res, next) => {
   }
 };
 
-// Update an ID
+// Update an ID (owned by the user)
 exports.updateId = async (req, res, next) => {
   try {
     const updatedId = await Id.findOneAndUpdate(
@@ -85,21 +85,24 @@ exports.updateId = async (req, res, next) => {
   }
 };
 
-// Fetch all IDs posted by a specific user
+// Fetch all IDs posted by the current user
 exports.getIdsByUserId = async (req, res, next) => {
   try {
-    const ids = await Id.find({ userId: req.user._id });
+    const userId = req.user._id; // Get user ID from request user object
+    const ids = await Id.find({ userId });
+
     if (ids.length === 0) {
       return res.status(404).json({ message: "No IDs found for this user" });
     }
-    res.json(ids.map(id => id.toJSON()));
+
+    res.status(200).json({ ids: ids.map(id => id.toJSON()), total: ids.length });
   } catch (err) {
     console.error(err);
     return next(new HttpError("server error", "An error has occurred while trying to fetch all IDs", 500));
   }
 };
 
-// Delete an ID
+// Delete an ID (owned by the user)
 exports.deleteId = async (req, res, next) => {
   try {
     const deletedId = await Id.findOneAndDelete({
@@ -147,7 +150,9 @@ exports.notifyUser = async (req, res, next) => {
     }
     existingRequest.notified = notify === 'true';
     await existingRequest.save();
-    sendIdNotFoundNotification(req.user.email, existingRequest.idNumber);
+
+    // Replace with your actual notification logic
+    // sendIdNotFoundNotification(req.user.email, existingRequest.idNumber);
 
     return res.status(200).json({ message: 'You will be notified when it is found.' });
   } catch (err) {

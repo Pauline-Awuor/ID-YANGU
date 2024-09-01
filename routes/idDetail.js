@@ -16,7 +16,7 @@ router.get('/:id', accessToken, idController.getId);
 router.patch('/:id', accessToken, idController.updateId);
 
 // Fetch all IDs posted by a specific user
-router.get('/user/:userId', accessToken, idController.getIdsByUserId);
+router.get('/user', accessToken, idController.getIdsByUserId);  // Updated route to use query parameters
 
 // Delete an ID (owned by the user)
 router.delete('/:id', accessToken, idController.deleteId);
