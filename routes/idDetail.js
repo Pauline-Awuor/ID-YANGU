@@ -1,25 +1,33 @@
-const express = require("express");
-const idController = require("../controllers/idController");
-const accessToken = require("../middleware/accessToken");
-const IdRequest = require('../models/IdRequest');
-const userController = require("../controllers/userController");
-
+const express = require('express');
 const router = express.Router();
+const idController = require('../controllers/idController');
+const accessToken = require('../middleware/accessToken');
 
-router.post("/", accessToken, idController.createId);
+// Create a new ID
+router.post('/create', accessToken, idController.createId);
 
-router.patch("/:id", accessToken, idController.updateId);
+// Get all IDs (admin only)
+router.get('/all', accessToken, idController.getAllIds);
 
-router.get("/", idController.getAllIds);
+// Get one ID (owned by the user)
+router.get('/:id', accessToken, idController.getId);
 
-router.get("/single/:id", accessToken, idController.getId);
+// Update an ID (owned by the user)
+router.patch('/:id', accessToken, idController.updateId);
 
-router.delete("/:id", accessToken, idController.deleteId);
+// Fetch all IDs posted by a specific user
+router.get('/user/:userId', accessToken, idController.getIdsByUserId);
 
-// Search endpoint
-router.get("/search", accessToken, idController.searchId);
+// Delete an ID (owned by the user)
+router.delete('/:id', accessToken, idController.deleteId);
 
+// Search for an ID
+router.get('/search', accessToken, idController.searchId);
 
-router.get('/posted-ids', accessToken, userController.getPostedIds);
+// Notify User
+router.post('/notify', accessToken, idController.notifyUser);
+
+// Get the total count of IDs (accessible to everyone)
+router.get('/count', idController.getTotalCountOfIds);
 
 module.exports = router;
